@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+import sys
+
+# Variables
+source_arr = []
+output_arr = []
+
+dups = []
+
+c = 0
+
+# Funciones
+
+# Comparación de segmentos
+def eq_segments(seg1_row, seg2_row):
+    # División de columnas
+    seg1_cols = seg1_row.split("\t")
+    seg2_cols = seg2_row.split("\t")
+
+    # Coordenadas
+    seg1 = [seg1_cols[1], seg1_cols[2]]
+    seg2 = [seg2_cols[1], seg2_cols[2]]
+
+    # Comparación
+    if seg1[0] == seg2[0] and seg1[1] == seg2[1]:
+        return True
+
+    # Se asume que no son iguales
+    return False
+
+# Comparación de índices
+def dup_compare(index, dup_list):
+    for d in dup_list:
+        if d == index:
+            return True
+
+    # Se asume que no son iguales
+    return False
+
+def progress(count, total):
+    perc = (round(10000*count/total))/100
+    print(str(perc) + "%")
+
+# Chequear número de argumenos
+if len(sys.argv) == 1:
+    print("Se requiere al menos un archivo! Como sigue:")
+    print("$ ./remove_duplicates file1.bed file2.bed ... filen.bed")
+    exit()
+
+# Abrir archivos de lectura
+for i in range(1, len(sys.argv)):
+    source = open(sys.argv[i], "r")
+
+    # Traspasar a arreglo
+    for line in source:
+        source_arr.append(line)
+
+    # Cerrar archivo lectura
+    source.close()
+
+# Abrir archivo de escritura
+output = open("undup_output.bed" , "w")
+
+total_len = len(source_arr)
+
+# Recorrer arreglo al revés, marcar duplicados
+for i in range(total_len, 0, -1):
+    # Índice efectivo para comparación
+    cix = i - 1
+    for j in range(cix):
+        # Si es verdadero, son iguales
+        if eq_segments(source_arr[cix], source_arr[j]):            
+            # Se agrega a lista de duplicados
+            dups.append(j)
+            #break
+    if c % 25 == 0:
+        progress(c, total_len)
+    c += 1
+
+# Remover duplicados, desde el último al primero
+for i in range(len(source_arr)):
+    # Si son iguales, no pasa nada
+    if dup_compare(i, dups):
+        continue
+    # Sino, escribimos
+    else:
+        output_arr.append(source_arr[i])
+
+# Escribir y cerrar archivo de escritura
+for seg in output_arr:
+    output.write(str(seg).replace("\n", "") + "\n")
+
+output.close()
