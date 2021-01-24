@@ -7,4 +7,4 @@ Small program to remove duplicate segments (determined by start and end) from a 
 
 ## Usage
 
-./remove_duplicates file1.bed file2.bed file3.bed ... filen.bed
+$ ./remove_duplicates file1.bed file2.bed file3.bed ... filen.bed
