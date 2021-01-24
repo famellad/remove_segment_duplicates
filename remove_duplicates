@@ -38,13 +38,13 @@ def dup_compare(index, dup_list):
     return False
 
 def progress(count, total):
-    perc = (round(10000*count/total))/100
+    perc = round(100*count/total, 2)
     print(str(perc) + "%")
 
 # Chequear número de argumenos
 if len(sys.argv) == 1:
     print("Se requiere al menos un archivo! Como sigue:")
-    print("$ ./remove_duplicates file1.bed file2.bed ... filen.bed")
+    print("$ ./remove_duplicates file1.bed file2.bed ... fileN.bed")
     exit()
 
 # Abrir archivos de lectura
