@@ -37,7 +37,7 @@ def dup_compare(index, dup_list):
     # Se asume que no son iguales
     return False
 
-def progress(count, total):
+def calc_progress(count, total):
     perc = round(100*count/total, 2)
     print(str(perc) + "%")
 
@@ -74,7 +74,7 @@ for i in range(total_len, 0, -1):
             dups.append(j)
             #break
     if c % 25 == 0:
-        progress(c, total_len)
+        calc_progress(c, total_len)
     c += 1
 
 # Remover duplicados, desde el último al primero
