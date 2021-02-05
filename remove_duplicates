@@ -2,6 +2,9 @@
 import sys
 
 # Variables
+discriminate_chr = True # Si el programa discrimina entre chr distintos o no
+overlap_thr = 0.5       # Cual es la proporción de superposición mínimo (del mayor) entre dos segmentos para considerarlos duplicados
+
 source_arr = []
 output_arr = []
 
@@ -10,23 +13,64 @@ dups = []
 c = 0
 
 # Funciones
-
 # Comparación de segmentos
-def eq_segments(seg1_row, seg2_row):
-    # División de columnas
-    seg1_cols = seg1_row.split("\t")
-    seg2_cols = seg2_row.split("\t")
-
-    # Coordenadas
-    seg1 = [seg1_cols[1], seg1_cols[2]]
-    seg2 = [seg2_cols[1], seg2_cols[2]]
-
-    # Comparación
-    if seg1[0] == seg2[0] and seg1[1] == seg2[1]:
+def eq_segments(seg1, seg2):
+    # Checar si intersectan
+    if seg1[2] < seg2[1] or seg2[2] < seg1[1]:
+        return False
+    # De aquí en adelante podemos asumir que estos dos segmentos intersectan
+    # 1er caso, seg2 está contenido en seg1
+    elif seg1[1] <= seg2[1] and seg1[2] >= seg2[2]:
+        # Seg 1, el segmento mayor, se mantiene igual, se unen los id
+        print("seg2 in seg1")
+        seg1[6] = seg1[6] + "-" + seg2[6]
         return True
-
-    # Se asume que no son iguales
+    # 2do caso, seg1 está contenido en seg2
+    elif seg1[1] >= seg2[1] and seg1[2] <= seg2[2]:
+        # Seg 1, el segmento menor, es reemplazado por seg2, se unen los id
+        print("seg1 in seg2")
+        seg1[1] = seg2[1]; seg1[2] = seg2[2]
+        seg1[6] = seg1[6] + "-" + seg2[6]
+        return True
+    # 3er caso, la longitud de intersección es más del overlap_thr% de la longitud del segmento más largo
+    elif overlap_prop(seg1, seg2) >= overlap_thr:
+        print("overlap")
+        seg1[1] = min(seg1[1], seg2[1]); seg1[2] = max(seg1[2], seg2[2])
+        seg1[6] = seg1[6] + "-" + seg2[6]
+        return True
+    
+    # Se asume que no son el mismo segmento
     return False
+
+# Calcula superposición entre dos segmentos
+def overlap_prop(seg1, seg2):
+    # Inicialización de variables
+    l1 = int(seg1[2]) - int(seg1[1])
+    l2 = int(seg2[2]) - int(seg2[1])
+    lmin = 0; lmax = 0
+    min_x = 0; min_y = 0
+    max_x = 0; max_y = 0
+    overlap = 0
+
+    # 1er caso, seg1 es mayor a seg2
+    if l1 >= l2:
+        lmin = l2; lmax = l1
+        min_x = int(seg2[1]); min_y = int(seg2[2])
+        max_x = int(seg1[1]); max_y = int(seg1[2])
+    # 2do caso, seg2 es mayor a seg1
+    else:
+        lmin = l1; lmax = l2
+        min_x = int(seg1[1]); min_y = int(seg1[2])
+        max_x = int(seg2[1]); max_y = int(seg2[2])
+
+    # TODO CALCULATE OVERLAP
+    # Largo intersección: min(max(s1), max(s2)) - max(min(s1), min(s2))
+    tmin = int(min(max(seg1[1], seg1[2]), max(seg2[1], seg2[2])))
+    tmax = int(max(min(seg1[1], seg1[2]), min(seg2[1], seg2[2])))
+
+    overlap = lmax / (tmin - tmax)
+
+    return overlap
 
 # Comparación de índices
 def dup_compare(index, dup_list):
@@ -69,9 +113,13 @@ for i in range(total_len, 0, -1):
     cix = i - 1
     for j in range(cix):
         # Si es verdadero, son iguales
-        if eq_segments(source_arr[cix], source_arr[j]):            
+        s1 = source_arr[cix].split('\t')
+        s2 = source_arr[j].split('\t')
+        if eq_segments(s1, s2):            
             # Se agrega a lista de duplicados
             dups.append(j)
+            # Se actualiza el primer segmento, el que se conserva
+            source_arr[cix] = "\t".join(s1)
             #break
     if c % 25 == 0:
         calc_progress(c, total_len)
