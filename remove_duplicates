@@ -5,6 +5,8 @@ import sys
 discriminate_chr = True # Si el programa discrimina entre chr distintos o no
 overlap_thr = 0.5       # Cual es la proporción de superposición mínimo (del mayor) entre dos segmentos para considerarlos duplicados
 
+debugging = False
+
 source_arr = []
 output_arr = []
 
@@ -15,6 +17,10 @@ c = 0
 # Funciones
 # Comparación de segmentos
 def eq_segments(seg1, seg2):
+    # Checar si chr coincide
+    if discriminate_chr and seg1[0] != seg2[0]:
+        return False
+
     # Checar si intersectan
     if seg1[2] < seg2[1] or seg2[2] < seg1[1]:
         return False
@@ -22,19 +28,19 @@ def eq_segments(seg1, seg2):
     # 1er caso, seg2 está contenido en seg1
     elif seg1[1] <= seg2[1] and seg1[2] >= seg2[2]:
         # Seg 1, el segmento mayor, se mantiene igual, se unen los id
-        print("seg2 in seg1")
+        debug("seg2 in seg1")
         seg1[6] = seg1[6] + "-" + seg2[6]
         return True
     # 2do caso, seg1 está contenido en seg2
     elif seg1[1] >= seg2[1] and seg1[2] <= seg2[2]:
         # Seg 1, el segmento menor, es reemplazado por seg2, se unen los id
-        print("seg1 in seg2")
+        debug("seg1 in seg2")
         seg1[1] = seg2[1]; seg1[2] = seg2[2]
         seg1[6] = seg1[6] + "-" + seg2[6]
         return True
     # 3er caso, la longitud de intersección es más del overlap_thr% de la longitud del segmento más largo
     elif overlap_prop(seg1, seg2) >= overlap_thr:
-        print("overlap")
+        debug("overlap")
         seg1[1] = min(seg1[1], seg2[1]); seg1[2] = max(seg1[2], seg2[2])
         seg1[6] = seg1[6] + "-" + seg2[6]
         return True
@@ -77,17 +83,21 @@ def dup_compare(index, dup_list):
     for d in dup_list:
         if d == index:
             return True
-
     # Se asume que no son iguales
     return False
 
+# Utilities
 def calc_progress(count, total):
     perc = round(100*count/total, 2)
     print(str(perc) + "%")
 
+def debug(text):
+    if debugging:
+        print("DEBUG: " + text)
+
 # Chequear número de argumenos
 if len(sys.argv) == 1:
-    print("Se requiere al menos un archivo! Como sigue:")
+    print("Se requiere al menos un archivo como parámetro!")
     print("$ ./remove_duplicates file1.bed file2.bed ... fileN.bed")
     exit()
 
@@ -121,7 +131,7 @@ for i in range(total_len, 0, -1):
             # Se actualiza el primer segmento, el que se conserva
             source_arr[cix] = "\t".join(s1)
             #break
-    if c % 25 == 0:
+    if c % 10 == 0:
         calc_progress(c, total_len)
     c += 1
 
