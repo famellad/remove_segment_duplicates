@@ -53,28 +53,16 @@ def overlap_prop(seg1, seg2):
     # Inicialización de variables
     l1 = int(seg1[2]) - int(seg1[1])
     l2 = int(seg2[2]) - int(seg2[1])
-    lmin = 0; lmax = 0
-    min_x = 0; min_y = 0
-    max_x = 0; max_y = 0
+    lmax = 0
     overlap = 0
+    
+    lmax = max(l1, l2)
 
-    # 1er caso, seg1 es mayor a seg2
-    if l1 >= l2:
-        lmin = l2; lmax = l1
-        min_x = int(seg2[1]); min_y = int(seg2[2])
-        max_x = int(seg1[1]); max_y = int(seg1[2])
-    # 2do caso, seg2 es mayor a seg1
-    else:
-        lmin = l1; lmax = l2
-        min_x = int(seg1[1]); min_y = int(seg1[2])
-        max_x = int(seg2[1]); max_y = int(seg2[2])
-
-    # TODO CALCULATE OVERLAP
     # Largo intersección: min(max(s1), max(s2)) - max(min(s1), min(s2))
     tmin = int(min(max(seg1[1], seg1[2]), max(seg2[1], seg2[2])))
     tmax = int(max(min(seg1[1], seg1[2]), min(seg2[1], seg2[2])))
 
-    overlap = lmax / (tmin - tmax)
+    overlap = (tmin - tmax) / lmax
 
     return overlap
 
