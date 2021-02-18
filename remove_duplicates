@@ -25,10 +25,10 @@ def eq_segments(seg1, seg2):
     # Checar si la distancia es menor a max_distance
     if overlap_thr == 0:
         # Primer caso, seg1 está antes
-        if seg2[1] - seg1[2] <= max_distance:
+        if int(seg2[1]) - int(seg1[2]) <= max_distance:
             return True
         # Segundo caso, seg2 está antes
-        elif seg1[1] - seg2[2] <= max_distance:
+        elif int(seg1[1]) - int(seg2[2]) <= max_distance:
             return True
         
 
