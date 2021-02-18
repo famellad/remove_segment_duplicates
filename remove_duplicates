@@ -4,6 +4,7 @@ import sys
 # Variables
 discriminate_chr = True # Si el programa discrimina entre chr distintos o no
 overlap_thr = 0.5       # Cual es la proporción de superposición mínimo (del mayor) entre dos segmentos para considerarlos duplicados
+max_distance = 164      # Cual es la distancia máxima a considerar si es que overlap_thr = 0
 
 debugging = False
 
@@ -21,9 +22,20 @@ def eq_segments(seg1, seg2):
     if discriminate_chr and seg1[0] != seg2[0]:
         return False
 
+    # Checar si la distancia es menor a max_distance
+    if overlap_thr == 0:
+        # Primer caso, seg1 está antes
+        if seg2[1] - seg1[2] <= max_distance:
+            return True
+        # Segundo caso, seg2 está antes
+        elif seg1[1] - seg2[2] <= max_distance:
+            return True
+        
+
     # Checar si intersectan
     if seg1[2] < seg2[1] or seg2[2] < seg1[1]:
         return False
+
     # De aquí en adelante podemos asumir que estos dos segmentos intersectan
     # 1er caso, seg2 está contenido en seg1
     elif seg1[1] <= seg2[1] and seg1[2] >= seg2[2]:
