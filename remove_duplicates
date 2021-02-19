@@ -26,9 +26,15 @@ def eq_segments(seg1, seg2):
     if overlap_thr == 0:
         # Primer caso, seg1 está antes
         if int(seg2[1]) - int(seg1[2]) <= max_distance:
+            # Se alarga el segmento y se unen los id
+            seg1[2] = seg2[2]
+            seg1[6] = seg1[6] + "-" + seg2[6]
             return True
         # Segundo caso, seg2 está antes
         elif int(seg1[1]) - int(seg2[2]) <= max_distance:
+            # Se alarga el segmento y se unen los id
+            seg1[1] = seg2[1]
+            seg1[6] = seg1[6] + "-" + seg2[6]
             return True
         
 
