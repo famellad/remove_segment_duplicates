@@ -127,6 +127,15 @@ total_len = len(source_arr)
 for i in range(total_len, 0, -1):
     # Índice efectivo para comparación
     cix = i - 1
+
+    if c % 10 == 0:
+        calc_progress(c, total_len)
+    c += 1
+
+    # No revisa si línea va a ser descartada
+    if dup_compare(cix, dups):
+        continue
+
     for j in range(cix):
         # Si es verdadero, son iguales
         s1 = source_arr[cix].split('\t')
@@ -136,10 +145,6 @@ for i in range(total_len, 0, -1):
             dups.append(j)
             # Se actualiza el primer segmento, el que se conserva
             source_arr[cix] = "\t".join(s1)
-            #break
-    if c % 10 == 0:
-        calc_progress(c, total_len)
-    c += 1
 
 # Remover duplicados, desde el último al primero
 for i in range(len(source_arr)):
